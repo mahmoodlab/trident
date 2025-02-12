@@ -51,6 +51,16 @@ def encoder_factory(model_name, **kwargs):
         enc = MuskInferenceEncoder
     elif model_name == 'hibou_l':
         enc = HibouLInferenceEncoder
+    elif model_name == 'kaiko-vitb8':
+        enc = KaikoB8InferenceEncoder
+    elif model_name == 'kaiko-vitb16':
+        enc = KaikoB16InferenceEncoder
+    elif model_name == 'kaiko-vits8':
+        enc = KaikoS8InferenceEncoder
+    elif model_name == 'kaiko-vits16':
+        enc = KaikoS16InferenceEncoder
+    elif model_name == 'kaiko-vitl14':
+        enc = KaikoL14InferenceEncoder
     else:
         raise ValueError(f"Unknown encoder name {model_name}")
 
@@ -131,6 +141,7 @@ class MuskInferenceEncoder(BasePatchEncoder):
                 ms_aug=self.inference_aug,
                 return_global=self.return_global  
                 )[0]  # Forward pass yields (vision_cls, text_cls). We only need vision_cls.
+
 
 class Conchv1InferenceEncoder(BasePatchEncoder):
     
@@ -267,6 +278,51 @@ class HibouLInferenceEncoder(BasePatchEncoder):
     def forward_features(self, x):
         out = self.model(pixel_values=x)
         return out
+    
+
+class KaikoInferenceEncoder(BasePatchEncoder):
+    MODEL_NAME = None  # set in subclasses
+
+    def _build(self, **kwargs):
+        from torchvision.transforms import InterpolationMode
+        self.enc_name = f"kaiko-{self.MODEL_NAME}"
+        weights_path = get_weights_path("patch", self.enc_name)
+
+        if os.path.exists(weights_path):
+            model = torch.load(weights_path, map_location="cpu", weights_only=False)
+        else:
+            model = torch.hub.load("kaiko-ai/towards_large_pathology_fms", self.MODEL_NAME, trust_repo=True)
+            os.makedirs(os.path.dirname(weights_path), exist_ok=True)
+            torch.save(model, weights_path)
+
+        mean, std = get_constants("kaiko")
+        eval_transform = get_eval_transforms(mean, std, target_img_size=224, center_crop=True, interpolation=InterpolationMode.BILINEAR, max_size=None, antialias=True)
+        precision = torch.float32
+
+        return model, eval_transform, precision
+
+    def forward(self, x):
+        return self.model(x)
+
+
+class KaikoS16InferenceEncoder(KaikoInferenceEncoder):
+    MODEL_NAME = "vits16"
+
+
+class KaikoS8InferenceEncoder(KaikoInferenceEncoder):
+    MODEL_NAME = "vits8"
+
+
+class KaikoB16InferenceEncoder(KaikoInferenceEncoder):
+    MODEL_NAME = "vitb16"
+
+
+class KaikoB8InferenceEncoder(KaikoInferenceEncoder):
+    MODEL_NAME = "vitb8"
+
+
+class KaikoL14InferenceEncoder(KaikoInferenceEncoder):
+    MODEL_NAME = "vitl14"
 
 
 class ResNet50InferenceEncoder(BasePatchEncoder):

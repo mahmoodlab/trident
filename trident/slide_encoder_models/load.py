@@ -351,6 +351,17 @@ class MeanSlideEncoder(BaseSlideEncoder):
             embedding_dim = 1024
         elif model_name == 'mean-hibou_l':
             embedding_dim = 1024
+        elif model_name == 'mean-kaiko-vit8s':
+            embedding_dim = 384
+        elif model_name == 'mean-kaiko-vit16s':
+            embedding_dim = 384
+        elif model_name == 'mean-kaiko-vit8b':
+            embedding_dim = 768
+        elif model_name == 'mean-kaiko-vit16b':
+            embedding_dim = 768
+        elif model_name == 'mean-kaiko-vit14l':
+            embedding_dim = 1024
+        
         else:
             print(f"\033[93mWARNING: Could not automatically infer embedding_dim for mean encoder {self.enc_name}. Setting to None.\033[0m")
             embedding_dim = None

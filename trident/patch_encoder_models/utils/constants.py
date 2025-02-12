@@ -4,6 +4,8 @@ OPENAI_MEAN = [0.48145466, 0.4578275, 0.40821073]
 OPENAI_STD = [0.26862954, 0.26130258, 0.27577711]
 HIBOU_MEAN = [0.7068, 0.5755, 0.722]
 HIBOU_STD = [0.195, 0.2316, 0.1816]
+KAIKO_MEAN = [0.5, 0.5, 0.5]
+KAIKO_STD = [0.5, 0.5, 0.5]
 NONE_MEAN = None
 NONE_STD = None
 
@@ -16,5 +18,7 @@ def get_constants(norm='imagenet'):
         return HIBOU_MEAN, HIBOU_STD
     elif norm == 'none':
         return NONE_MEAN, NONE_STD
+    elif norm == 'kaiko':
+        return KAIKO_MEAN, KAIKO_STD
     else:
         raise ValueError(f"Invalid norm: {norm}")
