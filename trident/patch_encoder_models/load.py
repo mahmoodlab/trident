@@ -61,6 +61,8 @@ def encoder_factory(model_name, **kwargs):
         enc = KaikoS16InferenceEncoder
     elif model_name == 'kaiko-vitl14':
         enc = KaikoL14InferenceEncoder
+    elif model_name == 'lunit-vits8':
+        enc = LunitS8InferenceEncoder
     else:
         raise ValueError(f"Unknown encoder name {model_name}")
 
@@ -363,7 +365,27 @@ class ResNet50InferenceEncoder(BasePatchEncoder):
             out = out[0]
         return out
                      
+
+class LunitS8InferenceEncoder(BasePatchEncoder):
+    def _build(self, **kwargs):
+        import timm
+        from timm.data import resolve_model_data_config
+        from timm.data.transforms_factory import create_transform
+
+        self.enc_name = 'lunit-vits8'
+
+        model = timm.create_model(
+            model_name="hf-hub:1aurent/vit_small_patch8_224.lunit_dino",
+            pretrained=True,
+        )
+
+        data_config = resolve_model_data_config(model)
+        eval_transform = create_transform(**data_config, is_training=False)
+        precision = torch.float32
+
+        return model, eval_transform, precision
     
+
 class UNIInferenceEncoder(BasePatchEncoder):
     def _build(
         self, 

@@ -16,6 +16,7 @@
     "kaiko-vits8": "./kaiko_s8",
     "kaiko-vits16": "./kaiko_s16",
     "kaiko-vitl14": "./kaiko_l14",
+    "lunit-vits8": "./lunit_s8",
     "conch_v15": "./conchv1_5/pytorch_model_vision.bin",
     "custom_encoder": ""
 }

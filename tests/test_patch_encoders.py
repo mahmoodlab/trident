@@ -88,6 +88,10 @@ class TestPatchEncoders(unittest.TestCase):
         self._test_encoder_forward('kaiko-vitb8')
         self._test_encoder_forward('kaiko-vitb16')
         self._test_encoder_forward('kaiko-vitl14')
+        
+    def test_lunitvits8_forward(self):
+        self._test_encoder_forward('lunit-vits8')
+    
     
 
 if __name__ == '__main__':
