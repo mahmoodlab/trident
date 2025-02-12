@@ -49,6 +49,8 @@ def encoder_factory(model_name, **kwargs):
         enc = Phikonv2InferenceEncoder
     elif model_name == 'musk':
         enc = MuskInferenceEncoder
+    elif model_name == 'hibou_l':
+        enc = HibouLInferenceEncoder
     else:
         raise ValueError(f"Unknown encoder name {model_name}")
 
@@ -234,6 +236,38 @@ class PhikonInferenceEncoder(BasePatchEncoder):
         out = self.model(pixel_values=x)
         return out
     
+
+class HibouLInferenceEncoder(BasePatchEncoder):
+    def _build(self, **kwargs):
+
+        from transformers import AutoModel
+        from torchvision.transforms import InterpolationMode
+
+        self.enc_name = 'hibou_l'
+        weights_path = get_weights_path('patch', self.enc_name)
+        
+        if os.path.exists(weights_path):
+            model = AutoModel.from_pretrained(weights_path)
+        else:
+            model = AutoModel.from_pretrained("histai/hibou-L", trust_remote_code=True)
+            os.makedirs(weights_path, exist_ok=True)
+            model.save_pretrained(weights_path)
+        
+        mean, std = get_constants('hibou')
+        eval_transform = get_eval_transforms(mean, std, target_img_size=224, interpolation=InterpolationMode.BICUBIC, max_size=None, antialias=True)
+        precision = torch.float32
+
+        return model, eval_transform, precision
+    
+    def forward(self, x):
+        out = self.forward_features(x)
+        out = out.pooler_output
+        return out
+    
+    def forward_features(self, x):
+        out = self.model(pixel_values=x)
+        return out
+
 
 class ResNet50InferenceEncoder(BasePatchEncoder):
     def _build(

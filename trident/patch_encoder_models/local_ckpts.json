@@ -10,6 +10,7 @@
     "virchow2": "",
     "hoptimus0": "",
     "phikon_v2": "./phikon_v2",
+    "hibou_l": "./hibou_l",
     "conch_v15": "./conchv1_5/pytorch_model_vision.bin",
     "custom_encoder": ""
 }

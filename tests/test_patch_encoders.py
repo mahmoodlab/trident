@@ -78,6 +78,10 @@ class TestPatchEncoders(unittest.TestCase):
         
     def test_musk_forward(self):
         self._test_encoder_forward('musk')
+    
+    def test_hibou_l_forward(self):
+        self._test_encoder_forward('hibou_l')
+    
 
 if __name__ == '__main__':
     unittest.main()
