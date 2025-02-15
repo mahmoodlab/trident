@@ -52,12 +52,13 @@ python run_single_slide.py --slide_path wsis/xxxx.svs --job_dir ./trident_proces
 **Step 1: Tissue Segmentation:** Segments tissue vs. background from a list of WSIs
  - **Command**:
    ```bash
-   python run_batch_of_slides.py --task seg --wsi_dir ./wsis --job_dir ./trident_processed --gpu 0
+   python run_batch_of_slides.py --task seg --wsi_dir ./wsis --job_dir ./trident_processed --gpu 0 --segmenter hest
    ```
    - `--task seg`: Specifies that you want to do tissue segmentation.
    - `--wsi_dir ./wsis`: Path to the directory containing WSIs.
    - `--job_dir ./trident_processed`: Output directory for processed results.
    - `--gpu 0`: Uses GPU with index 0 for computation.
+   - `--segmenter`: Segmentation model. Defaults to `hest`. Switch to `grandqc` for fast H&E segmentation.
  - **Outputs**:
    - WSI thumbnails are saved in `./trident_processed/thumbnails`.
    - WSI thumbnails annotated with tissue contours are saved in `./trident_processed/contours`.
@@ -166,8 +167,7 @@ main()
 
 - **Q**: I am not satisfied with the tissue vs background segmentation. What can I do?
    - **A**: Trident uses GeoJSON to store and load segmentations. This format is natively supported by [QuPath](https://qupath.github.io/). You can load the Trident segmentation into QuPath, modify it using QuPath's annotation tools, and save the updated segmentation back to GeoJSON.
-   - **A**: You can try rerunning the segmentation step at a higher magnification (which may be slower, but more accurate).
-   - **A**: You can finetune the Trident segmentation model on a few annotated examples to improve performance for your specific use case.
+   - **A**: You can try another segmentation model by specifying `segmenter --grandqc`.
 
 - **Q**: I want to process a custom list of WSIs. Can I do it? Also, most of my WSIs don't have the micron per pixel (mpp) stored. Can I pass it?
    - **A**: Yes using the `--custom_list_of_wsis` argument. Provide a list of WSI names in a CSV (with slide extension, `wsi`). Optionally, provide the mpp (field `mpp`)
